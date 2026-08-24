@@ -37,6 +37,7 @@ include(KDECompilerSettings NO_POLICY_SCOPE)
 include(KDEClangFormat)
 include(KDEGitCommitHooks)
 include(ECMQmlModule)
+include(CTest)
 
 find_package(Qt6 ${QT_MIN_VERSION} REQUIRED NO_MODULE COMPONENTS Core Gui Qml Quick QuickControls2 QuickTemplates2)
 
@@ -79,6 +80,11 @@ add_definitions(-DKF_DISABLE_DEPRECATED_BEFORE_AND_AT=0x054900)
 add_subdirectory(style)
 
 add_subdirectory(kirigami-plasmadesktop-integration)
+
+if(BUILD_TESTING)
+    find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS QuickTest)
+    add_subdirectory(autotests)
+endif()
 
 set(CMAKECONFIG_INSTALL_DIR "${KDE_INSTALL_CMAKEPACKAGEDIR}/QQC2BreezeStyle")
 

@@ -18,11 +18,13 @@ T.ComboBox {
     id: control
 
     property real __indicatorMargin: control.indicator && control.indicator.visible && control.indicator.width > 0 ? control.spacing + indicator.width + control.spacing : 0
-    property real __widestImplicitContentWidth: implicitContentWidth
     readonly property bool __isContentItemTextInput: contentItem instanceof TextInput
 
+    // T.ComboBox implements implicitContentWidthPolicy using the TextInput-derived
+    // contentItem. Keep its implicitWidth binding intact so model and policy
+    // changes can still update the text metrics.
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
-                            __widestImplicitContentWidth + leftPadding + rightPadding)
+                            Math.max(20, implicitContentWidth) + implicitIndicatorWidth + leftPadding + rightPadding)
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              implicitContentHeight + topPadding + bottomPadding,
                              implicitIndicatorHeight + topPadding + bottomPadding)
@@ -64,7 +66,8 @@ T.ComboBox {
     indicator: Kirigami.Icon {
         implicitHeight: Kirigami.Units.iconSizes.sizeForLabels
         implicitWidth: implicitHeight
-        x: control.mirrored ? control.leftPadding : control.leftPadding + control.availableWidth + control.spacing
+        x: control.mirrored ? control.rightPadding + control.spacing
+                            : control.leftPadding + control.availableWidth + control.spacing
         y: control.topPadding + (control.availableHeight - height) / 2
         source: "arrow-down"
     }
@@ -230,28 +233,4 @@ T.ComboBox {
         }
     }
 
-    TextMetrics {
-        id: textMetrics
-    }
-
-    // Mimicks WidestTextWhenCompleted from Qt 6.
-    // Maybe use this if app devs are interested.
-    // Don't use it for now because lots of GUIs aren't designed for it.
-    /*
-    Component.onCompleted: {
-        // TODO: Remove in Qt 6
-        if (// Qt 6 does this in QQuickComboBoxPrivate::calculateWidestTextWidth()
-            __isContentItemTextInput
-            // Kind of an arbitrary limit, but prevents making lots of calculations with larger models
-            && control.count <= 20
-        ) {
-            let widest = Math.ceil(contentItem.contentWidth)
-            for (let i = 0; i < count; ++i) {
-                textMetrics.text = control.textAt(i)
-                widest = Math.max(widest, textMetrics.width)
-            }
-            __widestImplicitContentWidth = Math.ceil(widest) + contentItem.leftPadding + contentItem.rightPadding
-        }
-    }
-    */
 }
