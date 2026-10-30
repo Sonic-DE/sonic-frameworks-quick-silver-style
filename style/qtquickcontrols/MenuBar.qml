@@ -5,7 +5,6 @@
 import QtQuick
 import QtQuick.Templates as T
 import org.kde.kirigami as Kirigami
-import org.kde.breeze.impl as Impl
 
 T.MenuBar {
     id: controlRoot
@@ -27,7 +26,9 @@ T.MenuBar {
         }
     }
 
-    background: Impl.StandardRectangle {
-        color: Kirigami.Theme.backgroundColor
+    // Part of the window's tools area at the window's top; the separator only as its
+    // lowest bar (a menu bar has none otherwise).
+    background: Kirigami.ToolsAreaBackground {
+        separatorVisible: inToolsArea
     }
 }

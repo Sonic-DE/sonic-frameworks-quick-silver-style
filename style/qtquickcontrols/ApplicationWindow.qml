@@ -12,7 +12,14 @@ T.ApplicationWindow {
     id: window
 
     Kirigami.Theme.colorSet: Kirigami.Theme.Window
-    color: Kirigami.Theme.backgroundColor
+    // A translucent tools area shows what is behind the window: the window colour is then
+    // painted everywhere but there.
+    readonly property bool __translucentToolsArea: Kirigami.Theme.toolsArea.active && Kirigami.Theme.toolsArea.translucent
+    color: __translucentToolsArea ? "transparent" : Kirigami.Theme.backgroundColor
+    background: Kirigami.ToolsAreaWindowBackground {
+        visible: window.__translucentToolsArea
+        color: Kirigami.Theme.backgroundColor
+    }
 
     Item {
         id: headerColor

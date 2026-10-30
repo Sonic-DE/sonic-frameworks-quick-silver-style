@@ -21,6 +21,9 @@
 #include <KColorUtils>
 #include <KConfigGroup>
 #include <KIconColors>
+#include <Kirigami/Platform/ToolsArea>
+
+#include <QDynamicPropertyChangeEvent>
 
 class StyleSingleton : public QObject
 {
@@ -51,6 +54,7 @@ public:
 #endif
         connect(qGuiApp, &QGuiApplication::fontDatabaseChanged, this, &StyleSingleton::notifyWatchersConfigurationChange);
         qGuiApp->installEventFilter(this);
+        syncToolsArea();
 
 #ifndef Q_OS_ANDROID
         /* QtTextRendering uses less memory, so use it in low power mode.
@@ -205,7 +209,39 @@ protected:
         if (event->type() == QEvent::ApplicationPaletteChange) {
             refresh();
         }
+        if (event->type() == QEvent::DynamicPropertyChange
+            && static_cast<QDynamicPropertyChangeEvent*>(event)->propertyName() == "_sonic_tools_area_serial") {
+            syncToolsArea();
+        }
         return false;
+    }
+
+public:
+    // The tools area the platform theme publishes on the application (sonic-qt-theme-bridge's
+    // ToolsAreaSettings); without it, Theme.toolsArea keeps its defaults.
+    static void syncToolsArea()
+    {
+        auto* toolsArea = Kirigami::Platform::ToolsArea::instance();
+        const QVariant colors = qGuiApp->property("_sonic_tools_area_headerColors");
+        if (!colors.isValid()) {
+            toolsArea->setActive(false);
+            toolsArea->setBackgroundColors(QColor(), QColor());
+            toolsArea->setSeparatorColor(QColor());
+            toolsArea->setBlurBehind(false);
+            toolsArea->setOpaqueWhenMaximized(false);
+            toolsArea->setTitleBarHidden(false);
+            toolsArea->setTranslucent(false);
+            return;
+        }
+        const QPalette palette = colors.value<QPalette>();
+        toolsArea->setBackgroundColors(palette.color(QPalette::Active, QPalette::Window), palette.color(QPalette::Inactive, QPalette::Window));
+        toolsArea->setSeparatorColor(qGuiApp->property("_sonic_tools_area_separatorColor").value<QColor>());
+        toolsArea->setBlurBehind(qGuiApp->property("_sonic_tools_area_blurBehind").toBool());
+        toolsArea->setOpaqueWhenMaximized(qGuiApp->property("_sonic_tools_area_opaqueWhenMaximized").toBool());
+        toolsArea->setTitleBarHidden(qGuiApp->property("_sonic_tools_area_titleBarHidden").toBool());
+        // Only windows with an alpha channel can show through.
+        toolsArea->setTranslucent(qGuiApp->property("_sonic_tools_area_translucent").toBool() && QQuickWindow::hasDefaultAlphaBuffer());
+        toolsArea->setActive(true);
     }
 
 private:

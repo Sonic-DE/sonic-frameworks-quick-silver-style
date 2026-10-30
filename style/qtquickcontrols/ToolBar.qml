@@ -35,15 +35,12 @@ T.ToolBar {
     Kirigami.Theme.colorSet: __isHeader ? Kirigami.Theme.Header : Kirigami.Theme.Window
     Kirigami.Theme.inherit: false
 
-    background: Impl.StandardRectangle {
+    // A header toolbar joins the window's tools area.
+    background: Kirigami.ToolsAreaBackground {
         // Enough height for Buttons/ComboBoxes/TextFields with smallSpacing padding on top and bottom
         implicitHeight: Impl.Units.mediumControlHeight + (Kirigami.Units.smallSpacing * 2) + (separator.visible ? separator.height : 0)
-        color: Kirigami.Theme.backgroundColor
-        property Item separator: Kirigami.Separator {
-            parent: control.background
-            visible: control.__isHeader || control.__isFooter
-            width: parent.width
-            y: control.__isFooter ? 0 : parent.height - height
-        }
+        toolsAreaCandidate: control.__isHeader
+        separatorVisible: control.__isHeader || control.__isFooter
+        separatorEdge: control.__isFooter ? Qt.TopEdge : Qt.BottomEdge
     }
 }
