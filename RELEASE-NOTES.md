@@ -2,7 +2,7 @@
 
 Sonic Frameworks Quick Silver Style gives modern SonicDE apps the clean Silver look.
 
-## Unreleased
+## 6.8.2 (2026-11-10)
 
 - Toolbars and menu bars at the top of a window now blend with the title bar when the theme asks for it, see-through and blurred, while buttons and text fields on them stay solid and easy to read. Themes that don't use this look the same as before.
 
